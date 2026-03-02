@@ -2,12 +2,13 @@
   "info": {
     "_postman_id": "9a7cbdad-23ba-4797-ae5c-59bbf3206fe7",
     "name": "Simple Books API",
+    "description": "A complete Postman collection for testing and exploring the **Simple Books API** — a RESTful API for browsing books and managing orders. This collection doubles as both a reference guide and an end-to-end workflow test suite.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "17318486"
   },
   "item": [
     {
-      "name": "API status - Verify status is 200 OK",
+      "name": "API Status",
       "event": [
         {
           "listen": "test",
@@ -42,12 +43,66 @@
           "path": [
             "status"
           ]
-        }
+        },
+        "description": "#### `GET /status` — Check API Status\n\nVerifies the API is online and operational.\n\n``` http\nGET {{baseUrl}}/status\n\n ```\n\n**Response:**\n\n``` json\n{\n  \"status\": \"OK\"\n}\n\n ```\n\n**Tests:**\n\n- Asserts the response status code is `200 OK`."
       },
       "response": []
     },
     {
-      "name": "List of books - retrieve first available non-fiction book",
+      "name": "Register API client",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "pm.collectionVariables.set(\"email\", pm.variables.replaceIn(\"{{$randomEmail}}\"));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n   \"clientName\": \"Postman\",\r\n   \"clientEmail\": \"{{email}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api-clients",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api-clients"
+          ]
+        },
+        "description": "#### `POST /api-clients` — Register API Client\n\nRegisters a new client and returns an access token. Each email can only be registered once.\n\nThe randomly generated email will be saved to `email` in collection variables.\n\n``` http\nPOST {{baseUrl}}/api-clients\nContent-Type: application/json\n{\n  \"clientName\": \"Your Name\",\n  \"clientEmail\": \"your@email.com\"\n}\n\n ```\n\n**Response:**\n\n``` json\n{\n  \"accessToken\": \"your-access-token-here\"\n}\n\n ```\n\n**Tests:**\n\n- Asserts the response status code is `201 Created`."
+      },
+      "response": []
+    },
+    {
+      "name": "List Books",
       "event": [
         {
           "listen": "test",
@@ -96,12 +151,13 @@
               "value": "non-fiction"
             }
           ]
-        }
+        },
+        "description": "#### `GET /books` — List Books\n\nReturns a list of available books. Supports optional filtering by type.\n\n``` http\nGET {{baseUrl}}/books?type=non-fiction\n\n ```\n\n**Query Parameters:**\n\n| Parameter | Type | Required | Description |\n| --- | --- | --- | --- |\n| `type` | string | No | Filter by type: `fiction` or `non-fiction` |\n| `limit` | number | No | Limit the number of results (1–20) |\n\n**Response:**\n\n``` json\n[\n    {\n        \"id\": 2,\n        \"name\": \"Just as I Am\",\n        \"type\": \"non-fiction\",\n        \"available\": false\n    },\n    {\n        \"id\": 5,\n        \"name\": \"Untamed\",\n        \"type\": \"non-fiction\",\n        \"available\": true\n    }\n]\n\n ```\n\n**Tests:**\n\n- Asserts the response status code is `200 OK`.\n    \n- Finds the first available non-fiction book and saves its `id` to the `bookId` collection variable."
       },
       "response": []
     },
     {
-      "name": "Get single book - retrieve specified non-fiction book",
+      "name": "Get Single Book",
       "event": [
         {
           "listen": "test",
@@ -143,12 +199,13 @@
               "value": "{{bookId}}"
             }
           ]
-        }
+        },
+        "description": "#### `GET /books/:bookId` — Get Single Book\n\nReturns detailed information about a specific book.\n\n``` http\nGET {{baseUrl}}/books/:bookId\n\n ```\n\n**Path Parameters:**\n\n| Parameter | Type | Required | Description |\n| --- | --- | --- | --- |\n| `bookid` | integer | Yes | The ID of the book |\n\n**Response:**\n\n``` json\n{\n    \"id\": 5,\n    \"entityType\": \"BOOK\",\n    \"available\": true,\n    \"timestamp\": 1752239490804,\n    \"created\": \"2025-07-11T13:11:30.804Z\",\n    \"GSI1SK\": \"BOOK#5\",\n    \"name\": \"Untamed\",\n    \"current-stock\": 20,\n    \"GSI1PK\": \"TYPE#non-fiction\",\n    \"price\": 15.5,\n    \"PK\": \"BOOK#5\",\n    \"author\": \"Glennon Doyle\",\n    \"type\": \"non-fiction\",\n    \"SK\": \"METADATA\"\n}\n\n ```\n\n**Tests:**\n\n- Asserts the response status code is `200 OK`.\n    \n- Verifies the returned available non-fiction book has the correct `name`."
       },
       "response": []
     },
     {
-      "name": "Order book - order specified non-fiction book",
+      "name": "Place Order",
       "event": [
         {
           "listen": "test",
@@ -202,12 +259,13 @@
           "path": [
             "orders"
           ]
-        }
+        },
+        "description": "#### `POST /orders` — Place Order\n\nCreates a new book order under a random name.\n\n``` http\nPOST {{baseUrl}}/orders\nAuthorization: Bearer {{accessToken}}\nContent-Type: application/json\n{\n  \"bookId\": {{bookId}},\n  \"customerName\": \"{{$randomFullName}}\"\n}\n\n ```\n\n**Response:**\n\n``` json\n{\n  \"created\": true,\n  \"orderId\": \"PF6MflPDcuhWobZcgmJy5\"\n}\n\n ```\n\n**Tests:**\n\n- Asserts the response status code is `201 Created`.\n    \n- Verifies that `created` is true.\n    \n- Saves the returned `orderId` to the `orderId` collection variable."
       },
       "response": []
     },
     {
-      "name": "Get all book orders - verify ordered book on list",
+      "name": "Get All Orders",
       "event": [
         {
           "listen": "test",
@@ -268,12 +326,13 @@
           "path": [
             "orders"
           ]
-        }
+        },
+        "description": "#### `GET /orders` — Get All Orders\n\nReturns a list of all orders placed by an authenticated client.\n\n``` http\nGET {{baseUrl}}/orders\nAuthorization: Bearer {{accessToken}}\n\n ```\n\n**Response:**\n\n``` json\n[\n    {\n        \"id\": \"E-tHTTa4mZisAKyo-1q95\",\n        \"bookId\": 5,\n        \"customerName\": \"John doe\",\n        \"quantity\": 1,\n        \"timestamp\": 1772464784992\n    }\n]\n\n ```\n\n**Tests:**\n\n- Asserts the response status code is `200 OK`.\n    \n- Verifies the `orderID` of the recently placed order and that the `quantity` ordered was 1.\n    \n- Adds the `customerName` from the order to the `customerOrder` collection variable."
       },
       "response": []
     },
     {
-      "name": "Get an order - get your specified order",
+      "name": "Get Single Order",
       "event": [
         {
           "listen": "test",
@@ -341,12 +400,13 @@
               "value": "{{orderId}}"
             }
           ]
-        }
+        },
+        "description": "#### `GET /orders/:orderId` — Get Single Order\n\nReturns details of a specific order.\n\n``` http\nGET {{baseUrl}}/orders/:orderId\nAuthorization: Bearer {{accessToken}}\n\n ```\n\n**Path Parameters:**\n\n| Parameter | Type | Required | Description |\n| --- | --- | --- | --- |\n| `orderId` | string | Yes | The ID of the order |\n\n**Response:**\n\n``` json\n{\n  \"id\": \"PF6MflPDcuhWobZcgmJy5\",\n  \"bookId\": 2,\n  \"customerName\": \"John Doe\",\n  \"quantity\": 1,\n  \"timestamp\": 1636100000000\n}\n\n ```\n\n**Tests:**\n\n- Asserts the response status code is `200 OK`.\n    \n- Verifies the `orderID`, `customerName`, and `quantity` of the recently placed order are correct.\n    \n- Adds the `customerName` from the order to the `customerOrder` collection variable."
       },
       "response": []
     },
     {
-      "name": "Update an order - update the name on the order",
+      "name": "Update Order",
       "event": [
         {
           "listen": "test",
@@ -399,12 +459,13 @@
               "value": "{{orderId}}"
             }
           ]
-        }
+        },
+        "description": "#### `PATCH /orders/:orderId` — Update Order\n\nUpdates the customer name on an existing order with a new random name.\n\n``` http\nPATCH {{baseUrl}}/orders/:orderId\nAuthorization: Bearer {{accessToken}}\nContent-Type: application/json\n{\n  \"customerName\": \"Updated Name\"\n}\n\n ```\n\n**Response:** `204 No Content` (no body returned on success)\n\n**Tests:**\n\n- Asserts the response status is `204 No Content`."
       },
       "response": []
     },
     {
-      "name": "Get an order - verify name changed",
+      "name": "Get Single Order",
       "event": [
         {
           "listen": "test",
@@ -473,12 +534,13 @@
               "value": "{{orderId}}"
             }
           ]
-        }
+        },
+        "description": "#### `GET /orders/:orderId` — Get Single Order\n\nReturns details of a specific order.\n\n``` http\nGET {{baseUrl}}/orders/:orderId\nAuthorization: Bearer {{accessToken}}\n\n ```\n\n**Path Parameters:**\n\n| Parameter | Type | Required | Description |\n| --- | --- | --- | --- |\n| `orderId` | string | Yes | The ID of the order |\n\n**Response:**\n\n``` json\n{\n  \"id\": \"PF6MflPDcuhWobZcgmJy5\",\n  \"bookId\": 2,\n  \"customerName\": \"John Doe\",\n  \"quantity\": 1,\n  \"timestamp\": 1636100000000\n}\n\n ```\n\n**Tests:**\n\n- Asserts the response status code is `200 OK`.\n    \n- Verifies the `orderID` and `quantity` of the recently placed order are correct.\n    \n- Verified the `customerName` no longer contains its previous value."
       },
       "response": []
     },
     {
-      "name": "Delete an order - delete your order",
+      "name": "Delete Order",
       "event": [
         {
           "listen": "test",
@@ -486,9 +548,7 @@
             "exec": [
               "pm.test(\"Status code is 204\", function () {\r",
               "    pm.response.to.have.status(204);\r",
-              "});\r",
-              "\r",
-              "pm.execution.setNextRequest(null);"
+              "});"
             ],
             "type": "text/javascript",
             "packages": {},
@@ -533,12 +593,13 @@
               "value": "{{orderId}}"
             }
           ]
-        }
+        },
+        "description": "#### `DELETE /orders/:orderId` — Delete an Order\n\nPermanently deletes an order.\n\n``` http\nDELETE {{baseUrl}}/orders/:orderId\nAuthorization: Bearer {{accessToken}}\n\n ```\n\n**Response:** `204 No Content`\n\n**Tests:**\n\n- Asserts the response status is `204 No Content`."
       },
       "response": []
     },
     {
-      "name": "Get an order - verify order deleted",
+      "name": "Get Single Order",
       "event": [
         {
           "listen": "test",
@@ -600,12 +661,13 @@
               "value": "{{orderId}}"
             }
           ]
-        }
+        },
+        "description": "#### `GET /orders/:orderId` — Get Single Order\n\nReturns details of a specific order.\n\n``` http\nGET {{baseUrl}}/orders/:orderId\nAuthorization: Bearer {{accessToken}}\n\n ```\n\n**Path Parameters:**\n\n| Parameter | Type | Required | Description |\n| --- | --- | --- | --- |\n| `orderId` | string | Yes | The ID of the order |\n\n**Response:**\n\n``` json\n{\n  \"id\": \"PF6MflPDcuhWobZcgmJy5\",\n  \"bookId\": 2,\n  \"customerName\": \"John Doe\",\n  \"quantity\": 1,\n  \"timestamp\": 1636100000000\n}\n\n ```\n\n**Tests:**\n\n- Asserts the response status code is `404 Not Found`.\n    \n- Verifies the `orderID` and `quantity` of the recently placed order are correct.\n    \n- Verified the `customerName` no longer contains its previous value."
       },
       "response": []
     },
     {
-      "name": "Register API client - client already registered",
+      "name": "Register API client",
       "event": [
         {
           "listen": "test",
@@ -619,6 +681,17 @@
             "packages": {},
             "requests": {}
           }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
         }
       ],
       "request": {
@@ -626,7 +699,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n   \"clientName\": \"Postman\",\r\n   \"clientEmail\": \"blackhole@example.com\"\r\n}",
+          "raw": "{\r\n   \"clientName\": \"Postman\",\r\n   \"clientEmail\": \"{{email}}\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -641,7 +714,8 @@
           "path": [
             "api-clients"
           ]
-        }
+        },
+        "description": "#### `POST /api-clients` — Register API Client\n\nRegisters a new client and returns an access token. Each email can only be registered once.\n\n``` http\nPOST {{baseUrl}}/api-clients\nContent-Type: application/json\n{\n  \"clientName\": \"Your Name\",\n  \"clientEmail\": \"your@email.com\"\n}\n\n ```\n\n**Response (already registered):**\n\n``` json\n{\n  \"error\": \"API client already registered. Try a different email.\"\n}\n\n ```\n\n**Tests:**\n\n- Asserts the response status code is `409 Not Found`."
       },
       "response": []
     }
@@ -689,6 +763,10 @@
     },
     {
       "key": "customerName",
+      "value": ""
+    },
+    {
+      "key": "email",
       "value": ""
     }
   ]
