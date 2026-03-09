@@ -382,6 +382,7 @@ Content-Type: application/json
 {
   "error": "No order with id To92ErcmDlfJTfYyanj52."
 }
+```
 
 **Tests:** 
 - Certifies the response status code is `200 OK`.
