@@ -14,17 +14,38 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test(\"Status code is 200\", function () {\r",
+              "pm.test(\"Status code 200\", function () {\r",
               "    pm.response.to.have.status(200);\r",
               "});\r",
               "\r",
-              "const response = pm.response.json();\r",
+              "pm.test(\"Response time under 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
               "\r",
-              "console.log(response);\r",
+              "let response;\r",
               "\r",
-              "pm.test(\"Status is OK\", () => {\r",
+              "pm.test(\"Response body is JSON\", function () {\r",
+              "    response = pm.response.json()\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Status is OK\", function () {\r",
+              "    pm.expect(response).to.have.property('status');\r",
+              "    pm.expect(response.status).to.be.a('string');\r",
+              "    pm.expect(response.status).to.match(/^[A-Z]{2}$/);\r",
               "    pm.expect(response.status).to.eql(\"OK\");\r",
-              "});"
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -55,9 +76,26 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test(\"Status code is 201\", function () {\r",
+              "pm.test(\"Status code 201\", function () {\r",
               "    pm.response.to.have.status(201);\r",
-              "});"
+              "});\r",
+              "\r",
+              "pm.test(\"Response time under 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test(\"Response body is JSON\", function () {\r",
+              "    response = pm.response.json()\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Access token generated\", function () {\r",
+              "    pm.expect(response).to.have.property('accessToken');\r",
+              "    pm.expect(response.accessToken).to.be.a('string');\r",
+              "    pm.expect(response.accessToken).to.match(/^[a-z0-9]{64}$/);\r",
+              "});\r",
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -108,25 +146,45 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test(\"Status code is 200\", function () {\r",
+              "pm.test(\"Status code 200\", function () {\r",
               "    pm.response.to.have.status(200);\r",
               "});\r",
               "\r",
-              "const response = pm.response.json();\r",
+              "pm.test(\"Response time under 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
               "\r",
-              "const nonFictionBooks = response.filter((book) => book.available === true);\r",
+              "let response;\r",
               "\r",
-              "const book = (nonFictionBooks[0]);\r",
+              "pm.test(\"Response body is JSON\", function () {\r",
+              "    response = pm.response.json()\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Expected array objects present\", function () {\r",
+              "    response.forEach(function (book) {\r",
+              "        pm.expect(book).to.have.property('id').that.is.a('number').to.match(/^[0-9]{1}$/);\r",
+              "        pm.expect(book).to.have.property('name').that.is.a('string').to.match(/^[A-Za-z]/);\r",
+              "        pm.expect(book).to.have.property('type').that.is.a('string').to.match(/^[a-z]/);\r",
+              "        pm.expect(book).to.have.property('available').that.is.a('boolean').to.match(/^[a-z]/);\r",
+              "    });\r",
+              "});\r",
+              "\r",
+              "const randomFictionBook = response.filter((book) => book.type === \"fiction\" && book.available === true);\r",
+              "\r",
+              "const book = randomFictionBook[Math.floor(Math.random() * randomFictionBook.length)];\r",
+              "\r",
+              "pm.test(\"Random available fiction book found\", function () {\r",
+              "    pm.expect(book).to.be.an('object');\r",
+              "    pm.expect(book.type).to.eql(\"fiction\");\r",
+              "    pm.expect(book.available).to.eql(true);\r",
+              "});\r",
               "\r",
               "if (book) {\r",
               "    pm.collectionVariables.set(\"bookId\", book.id);\r",
+              "    pm.collectionVariables.set(\"bookName\", book.name);\r",
               "}\r",
-              "\r",
-              "pm.test(\"First available non-fiction book found\", () => {\r",
-              "    pm.expect(book).to.be.an('object');\r",
-              "    pm.expect(book.available).to.eql(true);\r",
-              "    pm.expect(book.type).to.eql(\"non-fiction\");\r",
-              "});"
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -138,7 +196,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/books?type=non-fiction",
+          "raw": "{{baseUrl}}/books",
           "host": [
             "{{baseUrl}}"
           ],
@@ -148,7 +206,8 @@
           "query": [
             {
               "key": "type",
-              "value": "non-fiction"
+              "value": "non-fiction",
+              "disabled": true
             }
           ]
         },
@@ -163,17 +222,44 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test(\"Status code is 200\", function () {\r",
+              "pm.test(\"Status code 200\", function () {\r",
               "    pm.response.to.have.status(200);\r",
               "});\r",
               "\r",
-              "const response = pm.response.json();\r",
+              "pm.test(\"Response time under 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
               "\r",
-              "pm.test(\"Desired non-fiction book in stock\", function () {\r",
-              "    pm.expect(response.name).to.be.eql(\"Untamed\");\r",
+              "let response;\r",
+              "\r",
+              "pm.test(\"Response body is JSON\", function () {\r",
+              "    response = pm.response.json()\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Expected objects present\", function () {\r",
+              "        pm.expect(response).to.have.property('id').that.is.a('number').to.match(/^[0-9]{1}$/);\r",
+              "        pm.expect(response).to.have.property('entityType').that.is.a('string').to.eql('BOOK');\r",
+              "        pm.expect(response).to.have.property('available').that.is.a('boolean').to.match(/^[a-z]/);\r",
+              "        pm.expect(response).to.have.property('timestamp').that.is.a('number').to.match(/^[0-9]{13}$/);\r",
+              "        pm.expect(response).to.have.property('created').that.is.a('string').to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/)\r",
+              "        pm.expect(response).to.have.property('GSI1SK').that.is.a('string').to.eql('BOOK#' + response.id)\r",
+              "        pm.expect(response).to.have.property('name').that.is.a('string').to.match(/^[A-Za-z]/);\r",
+              "        pm.expect(response).to.have.property('current-stock').that.is.a('number').to.match(/^[0-9]/);\r",
+              "        pm.expect(response).to.have.property('GSI1PK').that.is.a('string').to.eql('TYPE#' + response.type);\r",
+              "        pm.expect(response).to.have.property('price').that.is.a('number').to.match(/^[0-9]/);\r",
+              "        pm.expect(response).to.have.property('PK').that.is.a('string').to.eql('BOOK#' + response.id);\r",
+              "        pm.expect(response).to.have.property('author').that.is.a('string').to.match(/^[A-Za-z]/);\r",
+              "        pm.expect(response).to.have.property('type').that.is.a('string').to.match(/^[a-z]/);\r",
+              "        pm.expect(response).to.have.property('SK').that.is.a('string').to.eql(\"METADATA\");\r",
+              "    });\r",
+              "\r",
+              "pm.test(\"Desired fiction book in stock\", function () {\r",
+              "    pm.expect(response.id).to.be.eql(pm.collectionVariables.get(\"bookId\"));\r",
+              "    pm.expect(response.name).to.be.eql(pm.collectionVariables.get(\"bookName\"));\r",
+              "    pm.expect(response.type).to.be.eql(\"fiction\")\r",
               "    pm.expect(response[\"current-stock\"]).to.be.above(0);\r",
-              "    pm.expect(response.type).to.be.eql(\"non-fiction\")\r",
-              "}); "
+              "});\r",
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -211,17 +297,32 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test(\"Status code is 201\", function () {\r",
+              "pm.test(\"Status code 201\", function () {\r",
               "    pm.response.to.have.status(201);\r",
               "});\r",
               "\r",
-              "const response = pm.response.json();\r",
+              "pm.test(\"Response time under 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test(\"Response body is JSON\", function () {\r",
+              "    response = pm.response.json()\r",
+              "});\r",
               "\r",
               "pm.collectionVariables.set(\"orderId\", response.orderId);\r",
               "\r",
+              "pm.test(\"Expected objects present\", function () {\r",
+              "        pm.expect(response).to.have.property('created').that.is.a('boolean').to.match(/^[a-z]/);\r",
+              "        pm.expect(response).to.have.property('orderId').that.is.a('string').to.match(/^[A-Za-z0-9-_]{21}$/);\r",
+              "    });\r",
+              "\r",
               "pm.test(\"Order created\", function () {\r",
               "    pm.expect(response.created).to.eql(true);\r",
-              "}); "
+              "    pm.expect(response.orderId).to.eql(pm.collectionVariables.get(\"orderId\"));\r",
+              "});\r",
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -271,21 +372,41 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test(\"Status code is 200\", function () {\r",
+              "pm.test(\"Status code 200\", function () {\r",
               "    pm.response.to.have.status(200);\r",
               "});\r",
               "\r",
-              "const response = pm.response.json();\r",
+              "pm.test(\"Response time under 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test(\"Response body is JSON\", function () {\r",
+              "    response = pm.response.json()\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Expected array objects present\", function () {\r",
+              "    response.forEach(function (book) {\r",
+              "        pm.expect(book).to.have.property('id').that.is.a('string').to.match(/^[A-Za-z0-9-_]{21}$/);\r",
+              "        pm.expect(book).to.have.property('bookId').that.is.a('number').to.match(/^[0-9]{1}$/);\r",
+              "        pm.expect(book).to.have.property('customerName').that.is.a('string').to.match(/^[A-Za-z]/);\r",
+              "        pm.expect(book).to.have.property('quantity').that.is.a('number').to.match(/^[0-9]/);\r",
+              "        pm.expect(book).to.have.property('timestamp').that.is.a('number').to.match(/^[0-9]{13}$/);\r",
+              "    });\r",
+              "});\r",
               "\r",
               "const orderId = pm.collectionVariables.get(\"orderId\");\r",
               "const order = Array.isArray(response) ? response.find(o => o.id === orderId) : response;\r",
               "\r",
-              "pm.collectionVariables.set(\"customerName\", order.customerName);\r",
-              "\r",
               "pm.test(\"Order present\", function () {\r",
               "    pm.expect(order.id).to.eql(orderId);\r",
+              "    pm.expect(order.bookId).to.eql(pm.collectionVariables.get(\"bookId\"));\r",
               "    pm.expect(order.quantity).to.eql(1);\r",
-              "});"
+              "});\r",
+              "\r",
+              "pm.collectionVariables.set(\"customerName\", order.customerName);\r",
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -342,17 +463,31 @@
               "    pm.response.to.have.status(200);\r",
               "});\r",
               "\r",
-              "const response = pm.response.json();\r",
+              "pm.test(\"Response time is less than 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
               "\r",
-              "const orderId = pm.collectionVariables.get(\"orderId\");\r",
+              "let response;\r",
               "\r",
-              "const customerName = pm.collectionVariables.get(\"customerName\");\r",
+              "pm.test(\"Response body is JSON\", function () {\r",
+              "    response = pm.response.json()\r",
+              "});\r",
               "\r",
-              "pm.test(\"Order id and name correct\", function () {\r",
-              "    pm.expect(response.id).to.eql(orderId);\r",
-              "    pm.expect(response.customerName).to.eql(customerName);\r",
+              "pm.test(\"Expected objects present\", function () {\r",
+              "    pm.expect(response).to.have.property('id').that.is.a('string').to.match(/^[A-Za-z0-9-_]{21}$/);\r",
+              "    pm.expect(response).to.have.property('bookId').that.is.a('number').to.match(/^[0-9]{1}$/);\r",
+              "    pm.expect(response).to.have.property('customerName').that.is.a('string').to.match(/^[A-Za-z]/);\r",
+              "    pm.expect(response).to.have.property('quantity').that.is.a('number').to.match(/^[0-9]/);\r",
+              "    pm.expect(response).to.have.property('timestamp').that.is.a('number').to.match(/^[0-9]{13}$/);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Order details correct\", function () {\r",
+              "    pm.expect(response.id).to.be.eql(pm.collectionVariables.get(\"orderId\"));\r",
+              "    pm.expect(response.bookId).to.be.eql(parseInt(pm.collectionVariables.get(\"bookId\")));\r",
+              "    pm.expect(response.customerName).to.be.eql(pm.collectionVariables.get(\"customerName\"));\r",
               "    pm.expect(response.quantity).to.eql(1);\r",
-              "});"
+              "});\r",
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -414,7 +549,18 @@
             "exec": [
               "pm.test(\"Status code is 204\", function () {\r",
               "    pm.response.to.have.status(204);\r",
-              "});"
+              "});\r",
+              "\r",
+              "pm.test(\"Response time is less than 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test(\"Response body is empty\", function () {\r",
+              "    pm.expect(pm.response.text()).to.be.empty;\r",
+              "});\r",
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -475,17 +621,29 @@
               "    pm.response.to.have.status(200);\r",
               "});\r",
               "\r",
-              "const response = pm.response.json();\r",
+              "pm.test(\"Response time is less than 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
               "\r",
-              "const orderId = pm.collectionVariables.get(\"orderId\");\r",
+              "let response;\r",
               "\r",
-              "const orderName = pm.collectionVariables.get(\"customerName\");\r",
+              "pm.test(\"Response body is JSON\", function () {\r",
+              "    response = pm.response.json()\r",
+              "});\r",
               "\r",
-              "pm.test(\"Order name changed\", function () {\r",
-              "    const order = Array.isArray(response) ? response.find(o => o.id === orderId) : response;\r",
-              "    pm.expect(order.id).to.eql(orderId);\r",
-              "    pm.expect(order.quantity).to.eql(1);\r",
-              "    pm.expect(order.customerName).to.not.eql(orderName);\r",
+              "pm.test(\"Expected objects present\", function () {\r",
+              "    pm.expect(response).to.have.property('id').that.is.a('string').to.match(/^[A-Za-z0-9-_]{21}$/);\r",
+              "    pm.expect(response).to.have.property('bookId').that.is.a('number').to.match(/^[0-9]{1}$/);\r",
+              "    pm.expect(response).to.have.property('customerName').that.is.a('string').to.match(/^[A-Za-z]/);\r",
+              "    pm.expect(response).to.have.property('quantity').that.is.a('number').to.match(/^[0-9]/);\r",
+              "    pm.expect(response).to.have.property('timestamp').that.is.a('number').to.match(/^[0-9]{13}$/);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Order details remain correct, but customer name has changed\", function () {\r",
+              "    pm.expect(response.id).to.be.eql(pm.collectionVariables.get(\"orderId\"));\r",
+              "    pm.expect(response.bookId).to.be.eql(parseInt(pm.collectionVariables.get(\"bookId\")));\r",
+              "    pm.expect(response.customerName).to.not.eql(pm.collectionVariables.get(\"customerName\"));\r",
+              "    pm.expect(response.quantity).to.eql(1);\r",
               "});"
             ],
             "type": "text/javascript",
@@ -548,7 +706,18 @@
             "exec": [
               "pm.test(\"Status code is 204\", function () {\r",
               "    pm.response.to.have.status(204);\r",
-              "});"
+              "});\r",
+              "\r",
+              "pm.test(\"Response time is less than 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test(\"Response body is empty\", function () {\r",
+              "    pm.expect(pm.response.text()).to.be.empty;\r",
+              "});\r",
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -609,11 +778,24 @@
               "    pm.response.to.have.status(404);\r",
               "});\r",
               "\r",
-              "const response = pm.response.json();\r",
+              "pm.test(\"Response time is less than 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test(\"Response body is JSON\", function () {\r",
+              "    response = pm.response.json()\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Expected objects present\", function () {\r",
+              "    pm.expect(response).to.have.property('error').that.is.a('string').to.match(/^[A-Za-z0-9-_]/);\r",
+              "});\r",
               "\r",
               "pm.test(\"Order not present\", function () {\r",
               "    pm.expect(response.error).to.eql(\"No order with id \" + pm.collectionVariables.get(\"orderId\") + \".\");\r",
-              "});"
+              "});\r",
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -667,6 +849,84 @@
       "response": []
     },
     {
+      "name": "Delete Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404\", function () {\r",
+              "    pm.response.to.have.status(404);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response time is less than 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test(\"Response body is JSON\", function () {\r",
+              "    response = pm.response.json()\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Expected objects present\", function () {\r",
+              "    pm.expect(response).to.have.property('error').that.is.a('string').to.match(/^[A-Za-z0-9-_]/);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Order not present\", function () {\r",
+              "    pm.expect(response.error).to.eql(\"No order with id \" + pm.collectionVariables.get(\"orderId\") + \".\");\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders/:orderId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "orders",
+            ":orderId"
+          ],
+          "variable": [
+            {
+              "key": "orderId",
+              "value": "{{orderId}}"
+            }
+          ]
+        },
+        "description": "#### `DELETE /orders/:orderId` — Delete an Order\n\nPermanently deletes an order.\n\n``` http\nDELETE {{baseUrl}}/orders/:orderId\nAuthorization: Bearer {{accessToken}}\n\n ```\n\n**Response:** `204 No Content`\n\n**Tests:**\n\n- Asserts the response status is `204 No Content`."
+      },
+      "response": []
+    },
+    {
       "name": "Register API client",
       "event": [
         {
@@ -675,7 +935,26 @@
             "exec": [
               "pm.test(\"Status code is 409\", function () {\r",
               "    pm.response.to.have.status(409);\r",
-              "});"
+              "});\r",
+              "\r",
+              "pm.test(\"Response time is less than 500ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+              "});\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test(\"Response body is JSON\", function () {\r",
+              "    response = pm.response.json()\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Expected objects present\", function () {\r",
+              "    pm.expect(response).to.have.property('error').that.is.a('string').to.match(/^[A-Za-z]/);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Order not present\", function () {\r",
+              "    pm.expect(response.error).to.eql(\"API client already registered. Try a different email.\");\r",
+              "});\r",
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -755,6 +1034,10 @@
     },
     {
       "key": "bookId",
+      "value": ""
+    },
+    {
+      "key": "bookName",
       "value": ""
     },
     {
