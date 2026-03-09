@@ -314,7 +314,7 @@ Authorization: Bearer {{accessToken}}
 ```
 
 **Tests:** 
-- Certifies the response status code is `200 OK`.
+- Certifies the response status code is `201 Created`.
 - Verifies the response time is under `500ms`.
 - Confirms the response body is JSON.
 - Checks the expected array objects are present.
@@ -377,7 +377,7 @@ Content-Type: application/json
 **Response:** `204 No Content` (no body returned on success)
 
 **Tests:** 
-- Certifies the response status code is `200 OK`.
+- Certifies the response status code is `204 No Content`.
 - Verifies the response time is under `500ms`.
 - Confirms the response body is empty for `204 No Content`
 - Confirms the response body contains correct error for `404 Not Found`.
@@ -405,10 +405,10 @@ Authorization: Bearer {{accessToken}}
 
 This request appears **twice** in the collection, each with a different test assertion:
 
-| Request Name          | Purpose                                                     |
-|-----------------------|-------------------------------------------------------------|
-| Delete Order          | Confirms the response body is empty on `204 No Content`     |
-| Delete Order          | Confirms the correct error takes place on `404 Not Found`   |
+| Request Name          | Purpose                                                                |
+|-----------------------|------------------------------------------------------------------------|
+| Delete Order          | Confirms the response body is empty on `204 No Content`                |
+| Delete Order          | Confirms the response body contains correct error for `404 Not Found`  |
 
 ---
 
