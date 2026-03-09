@@ -387,7 +387,8 @@ Content-Type: application/json
 **Tests:** 
 - Certifies the response status code is `200 OK`.
 - Verifies the response time is under `500ms`.
-- Confirms the response body is empty.
+- Confirms the response body is empty for `204 No Content`
+- Confirms the response body contains correct error for `404 Not Found`.
 
 ---
 
