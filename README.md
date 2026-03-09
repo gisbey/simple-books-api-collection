@@ -376,14 +376,6 @@ Content-Type: application/json
 
 **Response:** `204 No Content` (no body returned on success)
 
-**Response:** `404 Not Found` (when order id cannot be found)
-
-```json
-{
-  "error": "No order with id To92ErcmDlfJTfYyanj52."
-}
-```
-
 **Tests:** 
 - Certifies the response status code is `200 OK`.
 - Verifies the response time is under `500ms`.
@@ -401,7 +393,15 @@ DELETE {{baseUrl}}/orders/:orderId
 Authorization: Bearer {{accessToken}}
 ```
 
-**Response:** `204 No Content`
+**Response:** `204 No Content` (no body returned on success)
+
+**Response:** `404 Not Found` (when order id cannot be found)
+
+```json
+{
+  "error": "No order with id To92ErcmDlfJTfYyanj52."
+}
+```
 
 This request appears **twice** in the collection, each with a different test assertion:
 
