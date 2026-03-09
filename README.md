@@ -130,7 +130,10 @@ GET {{baseUrl}}/status
 ```
 
 **Tests:** 
-- Asserts the response status code is `200 OK`.
+- Certifies the response status code is 200 OK.
+- Verifies the response time is under 500ms.
+- Confirms the response body is JSON.
+- Checks that status is "OK". 
 
 ---
 
