@@ -506,7 +506,7 @@ curl -o- "https://dl-cli.pstmn.io/install.sh" | sh
 postman login --with-api-key YOUR_POSTMAN_API_KEY
 
 # Run the collection
-postman collection run 17318486-9a7cbdad-23ba-4797-ae5c-59bbf3206fe7
+postman collection run 2a834851-c0e5-474e-8c2a-06c6d09049c7
 ```
 
 ### Option 3: Scheduled Monitor
