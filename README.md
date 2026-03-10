@@ -201,7 +201,7 @@ GET {{baseUrl}}/books
 - Certifies the response status code is `200 OK`.
 - Verifies the response time is under `500ms`.
 - Confirms the response body is JSON.
-- Checks the expected array objects are present.
+- Checks the response fields are valid.
 - Selects a random available fiction book.
 - Saves its `id` to the `bookId` collection variable.
 - Save its `name` to the `customerName` collection variable.
@@ -247,7 +247,7 @@ GET {{baseUrl}}/books/:bookId
 - Certifies the response status code is `200 OK`.
 - Verifies the response time is under `500ms`.
 - Confirms the response body is JSON.
-- Checks the expected array objects are present.
+- Checks the response fields are valid.
 - Validates that your desired book is in stock.
 
 ---
@@ -284,7 +284,7 @@ Content-Type: application/json
 - Certifies the response status code is `201 Created`.
 - Verifies the response time is under `500ms`.
 - Confirms the response body is JSON.
-- Checks the expected array objects are present.
+- Checks the response fields are valid.
 - Verifies that the order was created.
 - Saves the returned `orderId` to the `orderId` collection variable.
 
@@ -317,7 +317,7 @@ Authorization: Bearer {{accessToken}}
 - Certifies the response status code is `201 Created`.
 - Verifies the response time is under `500ms`.
 - Confirms the response body is JSON.
-- Checks the expected array objects are present.
+- Checks the response fields are valid.
 - Verifies that your order is present.
 - Adds the `customerName` from the order to the `customerOrder` collection variable.
 
