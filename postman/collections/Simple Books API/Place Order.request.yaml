@@ -1,9 +1,10 @@
 $kind: http-request
 name: Place Order
-description: "Documentation available in Simple Books API repo README.md:
-  [https://github.com/gisbey/simple-books-api-collection/edit/main/README.md#po\
+description: "Documentation can be found in the simple-books-api-collection
+  repo's README.md file:
+  [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#po\
   st-orders--place-order](https://github.com/gisbey/simple-books-api-collection\
-  /edit/main/README.md#post-orders--place-order)."
+  /blob/main/README.md#post-orders--place-order)"
 url: "{{baseUrl}}/orders"
 method: POST
 body:
@@ -41,7 +42,7 @@ scripts:
       ─────────────────────────────────────────────────────────────────────────\
       ────\r
 
-      // HTTP Status & Performance Tests\r
+      // HTTP Validation\r
 
       //
       ─────────────────────────────────────────────────────────────────────────\
@@ -57,7 +58,7 @@ scripts:
 
       \r
 
-      pm.test(`HTTP: Response time < ${MAX_RESPONSE_TIME_MS}ms`, () => {\r
+      pm.test('Response time satisfactory', () => {\r
 
       \    pm.expect(pm.response.responseTime, 'Response too slow')\r
 
@@ -67,15 +68,13 @@ scripts:
 
       \r
 
-      pm.test('HTTP: Content-Type is JSON', () => {\r
+      pm.test('Content-Type is JSON', () => {\r
 
       \    const contentType = pm.response.headers.get('Content-Type');\r
 
       \    \r
 
       \    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r
-
-      \    \r
 
       \    pm.expect(contentType.toLowerCase(), 'Content-Type must include
       application/json')\r
@@ -112,11 +111,57 @@ scripts:
 
       \    response = pm.response.json();\r
 
-      \    \r
+      });\r
 
-      \    pm.expect(response, 'Response root must be an object')\r
+      \r
 
-      \        .to.be.an('object');\r
+      //
+      ─────────────────────────────────────────────────────────────────────────\
+      ────\r
+
+      // Schema Validation\r
+
+      //
+      ─────────────────────────────────────────────────────────────────────────\
+      ────\r
+
+      \r
+
+      pm.test('Schema is valid', () => {\r
+
+      \r
+
+      \    const schema = {\r
+
+      \        type: 'object',\r
+
+      \        properties: {\r
+
+      \            created: {\r
+
+      \                type: 'boolean',\r
+
+      \            },\r
+
+      \            orderId: {\r
+
+      \                type: 'string',\r
+
+      \                pattern: '^[A-Za-z0-9-_]{21}$'\r
+
+      \            }\r
+
+      \        },\r
+
+      \        required: ['created', 'orderId'],\r
+
+      \        additionalProperties: false\r
+
+      \    };\r
+
+      \r
+
+      \    pm.response.to.have.jsonSchema(schema);\r
 
       });\r
 
@@ -143,41 +188,6 @@ scripts:
       ────\r
 
       // Response Body Validation\r
-
-      //
-      ─────────────────────────────────────────────────────────────────────────\
-      ────\r
-
-      \r
-
-      pm.test(\"Response fields are valid\", () => {\r
-
-      \    pm.expect(response, 'Created must be a boolean')\r
-
-      \        .to.have.property('created')\r
-
-      \        .that.is.a('boolean')\r
-
-      \    \r
-
-      \    pm.expect(response, 'Order ID must be 21 chars: alphanumeric,
-      hyphens, underscores')\r
-
-      \        .to.have.property('orderId')\r
-
-      \        .that.is.a('string')\r
-
-      \        .to.match(/^[A-Za-z0-9-_]{21}$/);\r
-
-      \    });\r
-
-      \r
-
-      //
-      ─────────────────────────────────────────────────────────────────────────\
-      ────\r
-
-      // Business Logic Tests\r
 
       //
       ─────────────────────────────────────────────────────────────────────────\
