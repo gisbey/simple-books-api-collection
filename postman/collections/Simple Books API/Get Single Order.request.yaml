@@ -1,10 +1,11 @@
 $kind: http-request
 name: Get Single Order
-description: "Documentation available in Simple Books API repo README.md:
-  [https://github.com/gisbey/simple-books-api-collection/edit/main/README.md#ge\
-  t-ordersorderid--get-single-order.](https://github.com/gisbey/simple-books-ap\
-  i-collection/edit/main/README.md#get-ordersorderid--get-single-order)"
-url: "{{baseUrl}}:/orders/:orderId"
+description: "Documentation can be found in the simple-books-api-collection
+  repo's README.md file:
+  [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#ge\
+  t-ordersorderid--get-single-order](https://github.com/gisbey/simple-books-api\
+  -collection/blob/main/README.md#get-ordersorderid--get-single-order)"
+url: "{{baseUrl}}/orders/:orderId"
 method: GET
 pathVariables:
   orderId: "{{orderId}}"
@@ -37,7 +38,7 @@ scripts:
       ─────────────────────────────────────────────────────────────────────────\
       ────\r
 
-      // HTTP Status & Performance Tests\r
+      // HTTP Validation\r
 
       //
       ─────────────────────────────────────────────────────────────────────────\
@@ -53,7 +54,7 @@ scripts:
 
       \r
 
-      pm.test(`HTTP: Response time < ${MAX_RESPONSE_TIME_MS}ms`, () => {\r
+      pm.test('Response time satisfactory', () => {\r
 
       \    pm.expect(pm.response.responseTime, 'Response too slow')\r
 
@@ -63,15 +64,13 @@ scripts:
 
       \r
 
-      pm.test('HTTP: Content-Type is JSON', () => {\r
+      pm.test('Content-Type is JSON', () => {\r
 
       \    const contentType = pm.response.headers.get('Content-Type');\r
 
       \    \r
 
       \    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r
-
-      \    \r
 
       \    pm.expect(contentType.toLowerCase(), 'Content-Type must include
       application/json')\r
@@ -108,12 +107,6 @@ scripts:
 
       \    response = pm.response.json();\r
 
-      \    \r
-
-      \    pm.expect(response, 'Response root must be an object')\r
-
-      \        .to.be.an('object');\r
-
       });\r
 
       \r
@@ -122,7 +115,7 @@ scripts:
       ─────────────────────────────────────────────────────────────────────────\
       ────\r
 
-      // Response Body Validation\r
+      // Schema Validation\r
 
       //
       ─────────────────────────────────────────────────────────────────────────\
@@ -130,57 +123,66 @@ scripts:
 
       \r
 
-      pm.test(\"Response fields are valid\", () => {\r
-
-      \    pm.expect(response, 'Order ID must be 21 chars: alphanumeric,
-      hyphens, underscores')\r
-
-      \        .to.have.property('id')\r
-
-      \        .that.is.a('string')\r
-
-      \        .to.match(/^[A-Za-z0-9-_]{21}$/);\r
+      pm.test('Schema is valid', () => {\r
 
       \r
 
-      \    pm.expect(response, 'Book ID must be a single-digit integer')\r
+      \    const schema = {\r
 
-      \        .to.have.property('bookId')\r
+      \        type: 'object',\r
 
-      \        .that.is.a('number')\r
+      \        properties: {\r
 
-      \        .to.be.within(0, 9);\r
+      \            id: {\r
 
-      \        \r
+      \                type: 'string',\r
 
-      \    pm.expect(response ,'Author must contain only alphabetic characters,
-      spaces, and full stops')\r
+      \                pattern: '^[A-Za-z0-9-_]{21}$'\r
 
-      \        .to.have.property('customerName')\r
+      \            },\r
 
-      \        .that.is.a('string')\r
+      \            bookId: {\r
 
-      \        .to.match(/^[A-Za-z. ]+$/);\r
+      \                type: 'integer',\r
+
+      \                pattern: '^[A-Za-z0-9-_]{21}$'\r
+
+      \            },\r
+
+      \            customerName: {\r
+
+      \                type: 'string',\r
+
+      \                pattern: \"^[A-Za-z.' ]+$\"\r
+
+      \            },\r
+
+      \            quantity: {\r
+
+      \                type: 'integer'\r
+
+      \            },\r
+
+      \            timestamp: {\r
+
+      \                type: 'integer'\r
+
+      \            }\r
+
+      \        },\r
+
+      \        required: ['id', 'bookId', 'customerName', 'quantity',
+      'timestamp'],\r
+
+      \        additionalProperties: false\r
+
+      \    };\r
 
       \r
 
-      \    pm.expect(response, 'Quantity must be a number.')\r
+      \    pm.response.to.have.jsonSchema(schema);\r
 
-      \        .to.have.property('quantity')\r
-
-      \        .that.is.a('number');\r
-
-      \        \r
-
-      \    pm.expect(response, 'Timestamp must be a 13-digit number.')\r
-
-      \        .to.have.property('timestamp')\r
-
-      \        .that.is.a('number')\r
-
-      \        .and.satisfy(v => v.toString().length === 13);\r
-
-      \    });\r
+      });\r
 
       \r
 

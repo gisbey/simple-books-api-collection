@@ -1,9 +1,10 @@
 $kind: http-request
 name: API Status
-description: "Documentation available in Simple Books API repo README.md:
-  [https://github.com/gisbey/simple-books-api-collection/edit/main/README.md#ge\
-  t-status--check-api-status.](https://github.com/gisbey/simple-books-api-colle\
-  ction/edit/main/README.md#get-status--check-api-status)"
+description: "Documentation can be found in the simple-books-api-collection
+  repo's README.md file:
+  [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#ge\
+  t-status--check-api-status](https://github.com/gisbey/simple-books-api-collec\
+  tion/blob/main/README.md#get-status--check-api-status)"
 url: "{{baseUrl}}/status"
 method: GET
 scripts:
@@ -28,7 +29,7 @@ scripts:
       ─────────────────────────────────────────────────────────────────────────\
       ────\r
 
-      // HTTP Status & Performance Tests\r
+      // HTTP Validation\r
 
       //
       ─────────────────────────────────────────────────────────────────────────\
@@ -44,7 +45,7 @@ scripts:
 
       \r
 
-      pm.test(`HTTP: Response time < ${MAX_RESPONSE_TIME_MS}ms`, () => {\r
+      pm.test('Response time satisfactory', () => {\r
 
       \    pm.expect(pm.response.responseTime, 'Response too slow')\r
 
@@ -54,13 +55,13 @@ scripts:
 
       \r
 
-      pm.test('HTTP: Content-Type is JSON', () => {\r
+      pm.test('Content-Type is JSON', () => {\r
 
       \    const contentType = pm.response.headers.get('Content-Type');\r
 
-      \    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r
-
       \    \r
+
+      \    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r
 
       \    pm.expect(contentType.toLowerCase(), 'Content-Type must include
       application/json')\r
@@ -97,11 +98,51 @@ scripts:
 
       \    response = pm.response.json();\r
 
-      \    \r
+      });\r
 
-      \    pm.expect(response, 'Response root must be an object')\r
+      \r
 
-      \        .to.be.an('object');\r
+      //
+      ─────────────────────────────────────────────────────────────────────────\
+      ────\r
+
+      // Schema Validation\r
+
+      //
+      ─────────────────────────────────────────────────────────────────────────\
+      ────\r
+
+      \r
+
+      pm.test('Schema is valid', () => {\r
+
+      \r
+
+      \    const schema = {\r
+
+      \        type: 'object',\r
+
+      \        properties: {\r
+
+      \            status: {\r
+
+      \                type: 'string',\r
+
+      \                pattern: '^[A-Z]{2}$'\r
+
+      \            }\r
+
+      \        },\r
+
+      \        required: ['status'],\r
+
+      \        additionalProperties: false\r
+
+      \    };\r
+
+      \r
+
+      \    pm.response.to.have.jsonSchema(schema);\r
 
       });\r
 
@@ -119,19 +160,7 @@ scripts:
 
       \r
 
-      pm.test('Response \"status\" field is present and valid', () => {\r
-
-      \    pm.expect(response, 'Response must include status')\r
-
-      \        .to.have.property('status');\r
-
-      \r
-
-      \    pm.expect(response.status, 'Status must be a string')\r
-
-      \        .to.be.a('string');\r
-
-      \r
+      pm.test('Response \"status\" field must equal \"OK\"', () => {\r
 
       \    pm.expect(response.status, 'Status must equal \"OK\"')\r
 

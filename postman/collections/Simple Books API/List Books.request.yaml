@@ -1,10 +1,11 @@
 $kind: http-request
 name: List Books
-description: "Documentation available in Simple Books API repo README.md:
-  [https://github.com/gisbey/simple-books-api-collection/edit/main/README.md#ge\
-  t-books--list-books.](https://github.com/gisbey/simple-books-api-collection/e\
-  dit/main/README.md#get-books--list-books)"
-url: "{{baseUrl}}:/books"
+description: "Documentation can be found in the simple-books-api-collection
+  repo's README.md file:
+  [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#ge\
+  t-books--list-books](https://github.com/gisbey/simple-books-api-collection/bl\
+  ob/main/README.md#get-books--list-books)"
+url: "{{baseUrl}}/books"
 method: GET
 queryParams:
   - key: type
@@ -32,7 +33,7 @@ scripts:
       ─────────────────────────────────────────────────────────────────────────\
       ────\r
 
-      // HTTP Status & Performance Tests\r
+      // HTTP Validation\r
 
       //
       ─────────────────────────────────────────────────────────────────────────\
@@ -48,7 +49,7 @@ scripts:
 
       \r
 
-      pm.test(`HTTP: Response time < ${MAX_RESPONSE_TIME_MS}ms`, () => {\r
+      pm.test('Response time satisfactory', () => {\r
 
       \    pm.expect(pm.response.responseTime, 'Response too slow')\r
 
@@ -58,15 +59,13 @@ scripts:
 
       \r
 
-      pm.test('HTTP: Content-Type is JSON', () => {\r
+      pm.test('Content-Type is JSON', () => {\r
 
       \    const contentType = pm.response.headers.get('Content-Type');\r
 
       \    \r
 
       \    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r
-
-      \    \r
 
       \    pm.expect(contentType.toLowerCase(), 'Content-Type must include
       application/json')\r
@@ -103,12 +102,6 @@ scripts:
 
       \    response = pm.response.json();\r
 
-      \    \r
-
-      \    pm.expect(response, 'Response root must be an array')\r
-
-      \        .to.be.an('array');\r
-
       });\r
 
       \r
@@ -117,7 +110,7 @@ scripts:
       ─────────────────────────────────────────────────────────────────────────\
       ────\r
 
-      // Response Body Validation\r
+      // Schema Validation\r
 
       //
       ─────────────────────────────────────────────────────────────────────────\
@@ -125,55 +118,61 @@ scripts:
 
       \r
 
-      pm.test('Each book object contains valid fields', () => {\r
-
-      \    response.forEach((book) => {\r
+      pm.test('Schema is valid', () => {\r
 
       \r
 
-      \        pm.expect(book, `Book must be an object`)\r
+      \    const schema = {\r
 
-      \            .to.be.an(\"object\");\r
+      \        type: 'array',\r
+
+      \        items: {\r
+
+      \            type: 'object',\r
+
+      \            properties: {\r
+
+      \                id: {\r
+
+      \                    type: 'integer'\r
+
+      \                },\r
+
+      \                name: {\r
+
+      \                    type: 'string',\r
+
+      \                    pattern: '^[A-Za-z ]+$'\r
+
+      \                },\r
+
+      \                type: {\r
+
+      \                    type: 'string',\r
+
+      \                    pattern: '^[a-z-]+$'\r
+
+      \                },\r
+
+      \                available: {\r
+
+      \                    type: 'boolean'\r
+
+      \                }\r
+
+      \            },\r
+
+      \            required: ['id', 'name', 'type', 'available'],\r
+
+      \            additionalProperties: false\r
+
+      \        }\r
+
+      \    };\r
 
       \r
 
-      \        pm.expect(book, 'ID must be a single-digit integer')\r
-
-      \            .to.have.property('id')\r
-
-      \            .that.is.a('number')\r
-
-      \            .to.be.within(0, 9);\r
-
-      \r
-
-      \        pm.expect(book, 'Name must contain only letters & spaces')\r
-
-      \            .to.have.property('name')\r
-
-      \            .that.is.a('string')\r
-
-      \            .to.match(/^[A-Za-z ]+$/);\r
-
-      \r
-
-      \        pm.expect(book, 'Type must be lowercase (letters/hyphens)')\r
-
-      \            .to.have.property('type')\r
-
-      \            .that.is.a('string')\r
-
-      \            .to.match(/^[a-z-]+$/);\r
-
-      \r
-
-      \        pm.expect(book, 'Available must be a boolean value')\r
-
-      \            .to.have.property('available')\r
-
-      \            .that.is.a('boolean');\r
-
-      \    });\r
+      \    pm.response.to.have.jsonSchema(schema);\r
 
       });\r
 

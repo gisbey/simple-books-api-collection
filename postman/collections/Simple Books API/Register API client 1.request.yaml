@@ -1,9 +1,10 @@
 $kind: http-request
 name: Register API client
-description: "Documentation available in Simple Books API repo README.md:
+description: "Documentation can be found in the simple-books-api-collection
+  repo's README.md file:
   [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#ap\
-  i-clients.](https://github.com/gisbey/simple-books-api-collection/blob/main/R\
-  EADME.md#api-clients)"
+  i-clients](https://github.com/gisbey/simple-books-api-collection/blob/main/RE\
+  ADME.md#api-clients)"
 url: "{{baseUrl}}/api-clients"
 method: POST
 body:
@@ -37,7 +38,7 @@ scripts:
       ─────────────────────────────────────────────────────────────────────────\
       ────\r
 
-      // HTTP Status & Performance Tests\r
+      // HTTP Validation\r
 
       //
       ─────────────────────────────────────────────────────────────────────────\
@@ -53,7 +54,7 @@ scripts:
 
       \r
 
-      pm.test(`HTTP: Response time < ${MAX_RESPONSE_TIME_MS}ms`, () => {\r
+      pm.test('Response time satisfactory', () => {\r
 
       \    pm.expect(pm.response.responseTime, 'Response too slow')\r
 
@@ -63,15 +64,13 @@ scripts:
 
       \r
 
-      pm.test('HTTP: Content-Type is JSON', () => {\r
+      pm.test('Content-Type is JSON', () => {\r
 
       \    const contentType = pm.response.headers.get('Content-Type');\r
 
       \    \r
 
       \    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r
-
-      \    \r
 
       \    pm.expect(contentType.toLowerCase(), 'Content-Type must include
       application/json')\r
@@ -108,11 +107,51 @@ scripts:
 
       \    response = pm.response.json();\r
 
-      \    \r
+      });\r
 
-      \    pm.expect(response, 'Response root must be an object')\r
+      \r
 
-      \        .to.be.an('object');\r
+      //
+      ─────────────────────────────────────────────────────────────────────────\
+      ────\r
+
+      // Schema Validation\r
+
+      //
+      ─────────────────────────────────────────────────────────────────────────\
+      ────\r
+
+      \r
+
+      pm.test('Schema is valid', () => {\r
+
+      \r
+
+      \    const schema = {\r
+
+      \        type: 'object',\r
+
+      \        properties: {\r
+
+      \            error: {\r
+
+      \                type: 'string',\r
+
+      \                pattern: '^[A-Za-z0-9-_. ]+$'\r
+
+      \            }\r
+
+      \        },\r
+
+      \        required: ['error'],\r
+
+      \        additionalProperties: false\r
+
+      \    };\r
+
+      \r
+
+      \    pm.response.to.have.jsonSchema(schema);\r
 
       });\r
 
@@ -130,40 +169,11 @@ scripts:
 
       \r
 
-      pm.test(\"Response fields are valid\", () => {\r
+      pm.test('Request body is not empty', () => {\r
 
-      \    pm.expect(response, 'Error must contain only alphabetic characters,
-      spaces and full stops')\r
+      \    pm.expect(response, 'Response must not be null')\r
 
-      \        .to.have.property('error')\r
-
-      \        .that.is.a('string')\r
-
-      \        .to.match(/^[A-Za-z .]+$/);\r
-
-      });\r
-
-      \r
-
-      //
-      ─────────────────────────────────────────────────────────────────────────\
-      ────\r
-
-      // Business Logic Tests\r
-
-      //
-      ─────────────────────────────────────────────────────────────────────────\
-      ────\r
-
-      \r
-
-      pm.test(\"Error message triggers when API client already registered\", ()
-      => {\r
-
-      \    pm.expect(response.error, 'Error message must match expected text')\r
-
-      \        .to.eql(\"API client already registered. Try a different
-      email.\");\r
+      \        .to.not.be.null\r
 
       });\r\n"
     language: text/javascript

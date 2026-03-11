@@ -1,10 +1,11 @@
 $kind: http-request
 name: Update Order
-description: "Documentation available in Simple Books API repo README.md:
-  [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#pa\
-  tch-ordersorderid--update-order.](https://github.com/gisbey/simple-books-api-\
-  collection/blob/main/README.md#patch-ordersorderid--update-order)"
-url: "{{baseUrl}}:/orders/:orderId"
+description: "Documentation can be found in the simple-books-api-collection
+  repo's README.md file:
+  [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#ge\
+  t-ordersorderid--get-single-order](https://github.com/gisbey/simple-books-api\
+  -collection/blob/main/README.md#get-ordersorderid--get-single-order)"
+url: "{{baseUrl}}/orders/:orderId"
 method: PATCH
 pathVariables:
   orderId: "{{orderId}}"
@@ -57,7 +58,7 @@ scripts:
 
       \r
 
-      pm.test(`HTTP: Response time < ${MAX_RESPONSE_TIME_MS}ms`, () => {\r
+      pm.test(`Response time satisfactory`, () => {\r
 
       \    pm.expect(pm.response.responseTime, 'Response too slow')\r
 
