@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "743d86f3-99bd-438a-ad89-ed86fe5510d3",
+    "_postman_id": "745f01ae-036b-4e6c-bbf6-5b4b3dd69f63",
     "name": "Simple Books API",
     "description": "A complete Postman collection for testing and exploring the **Simple Books API** - a RESTful API for browsing books and managing orders. This collection doubles as both a reference guide and an end-to-end workflow test suite.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -78,7 +78,8 @@
               "",
               "pm.test('Response \"status\" field must equal \"OK\"', () => {",
               "    pm.expect(response.status, 'Status must equal \"OK\"').to.equal('OK');",
-              "});"
+              "});",
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -522,9 +523,21 @@
           }
         }
       ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
       "request": {
         "method": "GET",
         "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
         "url": {
           "raw": "{{baseUrl}}/books/:bookId",
           "host": [
