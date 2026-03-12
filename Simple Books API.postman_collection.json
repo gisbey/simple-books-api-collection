@@ -1,0 +1,1791 @@
+{
+  "info": {
+    "_postman_id": "ede2b60e-758b-4a67-8adf-da2ab3bd558d",
+    "name": "Simple Books API",
+    "description": "A complete Postman collection for testing and exploring the **Simple Books API** - a RESTful API for browsing books and managing orders. This collection doubles as both a reference guide and an end-to-end workflow test suite.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "17318486"
+  },
+  "item": [
+    {
+      "name": "API Status",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 200', () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "pm.test('Content-Type is JSON', () => {\r",
+              "    const contentType = pm.response.headers.get('Content-Type');\r",
+              "    \r",
+              "    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r",
+              "    pm.expect(contentType.toLowerCase(), 'Content-Type must include application/json')\r",
+              "        .to.include('application/json');\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test('Response is valid JSON', () => {\r",
+              "    pm.expect(pm.response.text(), 'Response body must not be empty')\r",
+              "        .to.not.be.empty;\r",
+              "    \r",
+              "    response = pm.response.json();\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Schema Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Schema is valid', () => {\r",
+              "\r",
+              "    const schema = {\r",
+              "        type: 'object',\r",
+              "        properties: {\r",
+              "            status: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Z]{2}$'\r",
+              "            }\r",
+              "        },\r",
+              "        required: ['status'],\r",
+              "        additionalProperties: false\r",
+              "    };\r",
+              "\r",
+              "    pm.response.to.have.jsonSchema(schema);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Response Body Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Response \"status\" field must equal \"OK\"', () => {\r",
+              "    pm.expect(response.status, 'Status must equal \"OK\"')\r",
+              "        .to.eql('OK');\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "status"
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-status--check-api-status](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-status--check-api-status)"
+      },
+      "response": []
+    },
+    {
+      "name": "Register API client",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 201', () => {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "pm.test('Content-Type is JSON', () => {\r",
+              "    const contentType = pm.response.headers.get('Content-Type');\r",
+              "    \r",
+              "    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r",
+              "    pm.expect(contentType.toLowerCase(), 'Content-Type must include application/json')\r",
+              "        .to.include('application/json');\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test('Response is valid JSON', () => {\r",
+              "    pm.expect(pm.response.text(), 'Response body must not be empty')\r",
+              "        .to.not.be.empty;\r",
+              "    \r",
+              "    response = pm.response.json();\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Schema Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Schema is valid', () => {\r",
+              "\r",
+              "    const schema = {\r",
+              "        type: 'object',\r",
+              "        properties: {\r",
+              "            accessToken: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[a-f0-9]{64}$'\r",
+              "            }\r",
+              "        },\r",
+              "        required: ['accessToken'],\r",
+              "        additionalProperties: false\r",
+              "    };\r",
+              "\r",
+              "    pm.response.to.have.jsonSchema(schema);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Response Body Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Request body is not empty', () => {\r",
+              "    pm.expect(response, 'Response must not be null')\r",
+              "        .to.not.be.null\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Random Email Generation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.collectionVariables.set(\"email\", pm.variables.replaceIn(\"{{$randomEmail}}\"));\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n   \"clientName\": \"Postman\",\r\n   \"clientEmail\": \"{{email}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api-clients",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api-clients"
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#api-clients](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#api-clients)"
+      },
+      "response": []
+    },
+    {
+      "name": "List Books",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 200', () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "pm.test('Content-Type is JSON', () => {\r",
+              "    const contentType = pm.response.headers.get('Content-Type');\r",
+              "    \r",
+              "    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r",
+              "    pm.expect(contentType.toLowerCase(), 'Content-Type must include application/json')\r",
+              "        .to.include('application/json');\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test('Response is valid JSON', () => {\r",
+              "    pm.expect(pm.response.text(), 'Response body must not be empty')\r",
+              "        .to.not.be.empty;\r",
+              "    \r",
+              "    response = pm.response.json();\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Schema Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Schema is valid', () => {\r",
+              "\r",
+              "    const schema = {\r",
+              "        type: 'array',\r",
+              "        items: {\r",
+              "            type: 'object',\r",
+              "            properties: {\r",
+              "                id: {\r",
+              "                    type: 'integer'\r",
+              "                },\r",
+              "                name: {\r",
+              "                    type: 'string',\r",
+              "                    pattern: '^[A-Za-z ]+$'\r",
+              "                },\r",
+              "                type: {\r",
+              "                    type: 'string',\r",
+              "                    pattern: '^[a-z-]+$'\r",
+              "                },\r",
+              "                available: {\r",
+              "                    type: 'boolean'\r",
+              "                }\r",
+              "            },\r",
+              "            required: ['id', 'name', 'type', 'available'],\r",
+              "            additionalProperties: false\r",
+              "        }\r",
+              "    };\r",
+              "\r",
+              "    pm.response.to.have.jsonSchema(schema);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Random Avilable Fiction Book Selection\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "// Filter for available fiction books\r",
+              "const availableFictionBook = response.filter((book) => \r",
+              "    book.type === \"fiction\" && \r",
+              "    book.available === true);\r",
+              "\r",
+              "//Select random fiction book from the filtered list\r",
+              "const book = availableFictionBook\r",
+              "    [Math.floor(Math.random() * availableFictionBook.length)];\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Business Logic Tests\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test(\"Random available fiction book valid\", () => {\r",
+              "    pm.expect(book, 'Book must be an object')\r",
+              "        .to.be.an('object');\r",
+              "    \r",
+              "    pm.expect(book.type, 'Book Type must be fiction')\r",
+              "        .to.eql(\"fiction\");\r",
+              "    \r",
+              "    pm.expect(book.available, 'Book must be available')\r",
+              "        .to.eql(true);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Export Variables\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "if (book) {\r",
+              "    pm.collectionVariables.set(\"bookId\", book.id);\r",
+              "    pm.collectionVariables.set(\"bookName\", book.name);\r",
+              "}\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books"
+          ],
+          "query": [
+            {
+              "key": "type",
+              "value": "non-fiction",
+              "disabled": true
+            }
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-books--list-books](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-books--list-books)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Book",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 200', () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "pm.test('Content-Type is JSON', () => {\r",
+              "    const contentType = pm.response.headers.get('Content-Type');\r",
+              "    \r",
+              "    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r",
+              "    pm.expect(contentType.toLowerCase(), 'Content-Type must include application/json')\r",
+              "        .to.include('application/json');\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test('Response is valid JSON', () => {\r",
+              "    pm.expect(pm.response.text(), 'Response body must not be empty')\r",
+              "        .to.not.be.empty;\r",
+              "    \r",
+              "    response = pm.response.json();\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Schema Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Schema is valid', () => {\r",
+              "\r",
+              "    const schema = {\r",
+              "        type: 'object',\r",
+              "        properties: {\r",
+              "            id: {\r",
+              "                type: 'integer',\r",
+              "            },\r",
+              "            entityType: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Z]{4}$'\r",
+              "            },\r",
+              "            available: {\r",
+              "                type: 'boolean',\r",
+              "            },\r",
+              "            timestamp: {\r",
+              "                type: 'integer',\r",
+              "            },\r",
+              "            created: {\r",
+              "                type: 'string',\r",
+              "                format: 'date-time'\r",
+              "            },\r",
+              "            isbn: {\r",
+              "                type: 'string',\r",
+              "                minLength: 10,\r",
+              "                maxLength: 10\r",
+              "            },\r",
+              "            GSI1SK: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Z0-9#]{6}$'\r",
+              "            },\r",
+              "            name: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Za-z ]+$'\r",
+              "            },\r",
+              "            'current-stock': {\r",
+              "                type: 'integer',\r",
+              "            },\r",
+              "            GSI1PK: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Za-z#]+$'\r",
+              "            },\r",
+              "            price: {\r",
+              "                type: 'number'\r",
+              "            },\r",
+              "            PK: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Z0-9#]{6}$'\r",
+              "            },\r",
+              "            author: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Za-z. ]+$'\r",
+              "            },\r",
+              "            type: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[a-z-]+$'\r",
+              "            },\r",
+              "            SK: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Z]{8}$'\r",
+              "            },\r",
+              "            \r",
+              "        },\r",
+              "        required: ['id', 'entityType', 'available', 'timestamp', 'created', 'GSI1SK', 'name', 'current-stock', 'GSI1PK', 'price', 'PK', 'author', 'type', 'SK']\r",
+              "    };\r",
+              "\r",
+              "    pm.response.to.have.jsonSchema(schema);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Business Logic Tests\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test(\"Desired fiction book in stock\", () => {\r",
+              "    pm.expect(response.id, 'Book ID must match bookId collection variable')\r",
+              "        .to.be.eql(pm.collectionVariables.get(\"bookId\"));\r",
+              "    \r",
+              "    pm.expect(response.name, 'Book name must match bookName collection variable')\r",
+              "        .to.be.eql(pm.collectionVariables.get(\"bookName\"));\r",
+              "    \r",
+              "    pm.expect(response.type, 'Book must be fiction')\r",
+              "        .to.be.eql(\"fiction\")\r",
+              "    \r",
+              "    pm.expect(response[\"current-stock\"], 'Book must be in stock')\r",
+              "        .to.be.above(0);\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/books/:bookId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "books",
+            ":bookId"
+          ],
+          "variable": [
+            {
+              "key": "bookId",
+              "value": "{{bookId}}"
+            }
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-booksbookid--get-single-book](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-booksbookid--get-single-book)"
+      },
+      "response": []
+    },
+    {
+      "name": "Place Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 201', () => {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "pm.test('Content-Type is JSON', () => {\r",
+              "    const contentType = pm.response.headers.get('Content-Type');\r",
+              "    \r",
+              "    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r",
+              "    pm.expect(contentType.toLowerCase(), 'Content-Type must include application/json')\r",
+              "        .to.include('application/json');\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test('Response is valid JSON', () => {\r",
+              "    pm.expect(pm.response.text(), 'Response body must not be empty')\r",
+              "        .to.not.be.empty;\r",
+              "    \r",
+              "    response = pm.response.json();\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Schema Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Schema is valid', () => {\r",
+              "\r",
+              "    const schema = {\r",
+              "        type: 'object',\r",
+              "        properties: {\r",
+              "            created: {\r",
+              "                type: 'boolean',\r",
+              "            },\r",
+              "            orderId: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Za-z0-9-_]{21}$'\r",
+              "            }\r",
+              "        },\r",
+              "        required: ['created', 'orderId'],\r",
+              "        additionalProperties: false\r",
+              "    };\r",
+              "\r",
+              "    pm.response.to.have.jsonSchema(schema);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Export Variables\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.collectionVariables.set(\"orderId\", response.orderId);\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Response Body Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test(\"Order created\", () => {\r",
+              "    pm.expect(response.created, 'Created must be true')\r",
+              "        .to.eql(true);\r",
+              "    \r",
+              "    pm.expect(response.orderId, 'Order ID must match orderId collection variable')\r",
+              "        .to.eql(pm.collectionVariables.get(\"orderId\"));\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"bookId\": {{bookId}},\r\n  \"customerName\": \"{{$randomFullName}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "orders"
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#post-orders--place-order](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#post-orders--place-order)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Orders",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 200', () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "pm.test('Content-Type is JSON', () => {\r",
+              "    const contentType = pm.response.headers.get('Content-Type');\r",
+              "    \r",
+              "    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r",
+              "    pm.expect(contentType.toLowerCase(), 'Content-Type must include application/json')\r",
+              "        .to.include('application/json');\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test('Response is valid JSON', () => {\r",
+              "    pm.expect(pm.response.text(), 'Response body must not be empty')\r",
+              "        .to.not.be.empty;\r",
+              "    \r",
+              "    response = pm.response.json();\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Schema Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Schema is valid', () => {\r",
+              "\r",
+              "    const schema = {\r",
+              "        type: 'array',\r",
+              "        items: {\r",
+              "            type: 'object',\r",
+              "            properties: {\r",
+              "                id: {\r",
+              "                    type: 'string',\r",
+              "                    pattern: '^[A-Za-z0-9-_]{21}$'\r",
+              "                },\r",
+              "                bookId: {\r",
+              "                    type: 'integer',\r",
+              "                },\r",
+              "                customerName: {\r",
+              "                    type: 'string',\r",
+              "                    pattern: \"^[A-Za-z.' ]+$\"\r",
+              "                },\r",
+              "                quantity: {\r",
+              "                    type: 'integer'\r",
+              "                },\r",
+              "                timestamp: {\r",
+              "                    type: 'integer'\r",
+              "                }\r",
+              "            },\r",
+              "            required: ['id', 'bookId', 'customerName', 'quantity', 'timestamp'],\r",
+              "            additionalProperties: false\r",
+              "        }\r",
+              "    };\r",
+              "\r",
+              "    pm.response.to.have.jsonSchema(schema);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Order Lookup\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const orderId = pm.collectionVariables.get(\"orderId\");\r",
+              "\r",
+              "const order = Array.isArray(response) ? response.find(o => o.id === orderId) : response;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Business Logic Tests\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Order present', function () {\r",
+              "    pm.expect(order.id, 'Order ID must match \"orderId\" collection variable')\r",
+              "        .to.eql(orderId);\r",
+              "    \r",
+              "    pm.expect(order.bookId, 'Book ID must match \"bookId\" collection varibale')\r",
+              "        .to.eql(pm.collectionVariables.get(\"bookId\"));\r",
+              "    \r",
+              "    pm.expect(order.quantity, 'Quantity should equal 1')\r",
+              "        .to.eql(1);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Export Variables\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.collectionVariables.set(\"customerName\", order.customerName);\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "orders"
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-orders--get-all-orders](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-orders--get-all-orders)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 200', () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "pm.test('Content-Type is JSON', () => {\r",
+              "    const contentType = pm.response.headers.get('Content-Type');\r",
+              "    \r",
+              "    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r",
+              "    pm.expect(contentType.toLowerCase(), 'Content-Type must include application/json')\r",
+              "        .to.include('application/json');\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test('Response is valid JSON', () => {\r",
+              "    pm.expect(pm.response.text(), 'Response body must not be empty')\r",
+              "        .to.not.be.empty;\r",
+              "    \r",
+              "    response = pm.response.json();\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Schema Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Schema is valid', () => {\r",
+              "\r",
+              "    const schema = {\r",
+              "        type: 'object',\r",
+              "        properties: {\r",
+              "            id: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Za-z0-9-_]{21}$'\r",
+              "            },\r",
+              "            bookId: {\r",
+              "                type: 'integer',\r",
+              "                pattern: '^[A-Za-z0-9-_]{21}$'\r",
+              "            },\r",
+              "            customerName: {\r",
+              "                type: 'string',\r",
+              "                pattern: \"^[A-Za-z.' ]+$\"\r",
+              "            },\r",
+              "            quantity: {\r",
+              "                type: 'integer'\r",
+              "            },\r",
+              "            timestamp: {\r",
+              "                type: 'integer'\r",
+              "            }\r",
+              "        },\r",
+              "        required: ['id', 'bookId', 'customerName', 'quantity', 'timestamp'],\r",
+              "        additionalProperties: false\r",
+              "    };\r",
+              "\r",
+              "    pm.response.to.have.jsonSchema(schema);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Business Logic Tests\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test(\"Order details correct\", () => {\r",
+              "    pm.expect(response.id, 'Order ID must match \"orderId\" collection variable')\r",
+              "        .to.be.eql(pm.collectionVariables.get(\"orderId\"));\r",
+              "    \r",
+              "    pm.expect(response.bookId, 'Book ID must match \"bookId\" collection variable')\r",
+              "        .to.be.eql(parseInt(pm.collectionVariables.get(\"bookId\")));\r",
+              "    \r",
+              "    pm.expect(response.customerName, 'Customer name must match \"customerName\" collection variable')\r",
+              "        .to.be.eql(pm.collectionVariables.get(\"customerName\"));\r",
+              "    \r",
+              "    pm.expect(response.quantity, 'Quantity should equal 1')\r",
+              "        .to.eql(1);\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders/:orderId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "orders",
+            ":orderId"
+          ],
+          "variable": [
+            {
+              "key": "orderId",
+              "value": "{{orderId}}"
+            }
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-ordersorderid--get-single-order](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-ordersorderid--get-single-order)"
+      },
+      "response": []
+    },
+    {
+      "name": "Update Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 204', () => {\r",
+              "    pm.response.to.have.status(204);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test(\"Response body is empty\", function () {\r",
+              "    pm.expect(pm.response.text()).to.be.empty;\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"customerName\": \"{{$randomFullName}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders/:orderId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "orders",
+            ":orderId"
+          ],
+          "variable": [
+            {
+              "key": "orderId",
+              "value": "{{orderId}}"
+            }
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-ordersorderid--get-single-order](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-ordersorderid--get-single-order)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 200', () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "pm.test('Content-Type is JSON', () => {\r",
+              "    const contentType = pm.response.headers.get('Content-Type');\r",
+              "    \r",
+              "    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r",
+              "    pm.expect(contentType.toLowerCase(), 'Content-Type must include application/json')\r",
+              "        .to.include('application/json');\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test('Response is valid JSON', () => {\r",
+              "    pm.expect(pm.response.text(), 'Response body must not be empty')\r",
+              "        .to.not.be.empty;\r",
+              "    \r",
+              "    response = pm.response.json();\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Schema Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Schema is valid', () => {\r",
+              "\r",
+              "    const schema = {\r",
+              "        type: 'object',\r",
+              "        properties: {\r",
+              "            id: {\r",
+              "                type: 'integer',\r",
+              "            },\r",
+              "            entityType: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Z]{4}$'\r",
+              "            },\r",
+              "            available: {\r",
+              "                type: 'boolean',\r",
+              "            },\r",
+              "            timestamp: {\r",
+              "                type: 'integer',\r",
+              "            },\r",
+              "            created: {\r",
+              "                type: 'string',\r",
+              "                format: 'date-time'\r",
+              "            },\r",
+              "            isbn: {\r",
+              "                type: 'string',\r",
+              "                minLength: 10,\r",
+              "                maxLength: 10\r",
+              "            },\r",
+              "            GSI1SK: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Z0-9#]{6}$'\r",
+              "            },\r",
+              "            name: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Za-z ]+$'\r",
+              "            },\r",
+              "            'current-stock': {\r",
+              "                type: 'integer',\r",
+              "            },\r",
+              "            GSI1PK: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Za-z#]+$'\r",
+              "            },\r",
+              "            price: {\r",
+              "                type: 'number'\r",
+              "            },\r",
+              "            PK: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Z0-9#]{6}$'\r",
+              "            },\r",
+              "            author: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Za-z. ]+$'\r",
+              "            },\r",
+              "            type: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[a-z-]+$'\r",
+              "            },\r",
+              "            SK: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Z]{8}$'\r",
+              "            },\r",
+              "            \r",
+              "        },\r",
+              "        required: ['id', 'entityType', 'available', 'timestamp', 'created', 'GSI1SK', 'name', 'current-stock', 'GSI1PK', 'price', 'PK', 'author', 'type', 'SK']\r",
+              "    };\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Business Logic Tests\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test(\"Order details remain correct, but customer name has changed\", () => {\r",
+              "    pm.expect(response.id, 'Order ID must match \"orderId\" collection variable')\r",
+              "        .to.be.eql(pm.collectionVariables.get(\"orderId\"));\r",
+              "    \r",
+              "    pm.expect(response.bookId, 'Book ID must match \"bookId\" collection variable')\r",
+              "        .to.be.eql(parseInt(pm.collectionVariables.get(\"bookId\")));\r",
+              "    \r",
+              "    pm.expect(response.customerName, 'Customer name must not match \"customerName\" collection variable')\r",
+              "        .to.not.eql(pm.collectionVariables.get(\"customerName\"));\r",
+              "    \r",
+              "    pm.expect(response.quantity, 'Quantity should equal 1')\r",
+              "        .to.eql(1);\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders/:orderId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "orders",
+            ":orderId"
+          ],
+          "variable": [
+            {
+              "key": "orderId",
+              "value": "{{orderId}}"
+            }
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-ordersorderid--get-single-order](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-ordersorderid--get-single-order)"
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 204', () => {\r",
+              "    pm.response.to.have.status(204);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test(\"Response body is empty\", function () {\r",
+              "    pm.expect(pm.response.text()).to.be.empty;\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders/:orderId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "orders",
+            ":orderId"
+          ],
+          "variable": [
+            {
+              "key": "orderId",
+              "value": "{{orderId}}"
+            }
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-ordersorderid--get-single-order](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-ordersorderid--get-single-order)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 404', () => {\r",
+              "    pm.response.to.have.status(404);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "pm.test('Content-Type is JSON', () => {\r",
+              "    const contentType = pm.response.headers.get('Content-Type');\r",
+              "    \r",
+              "    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r",
+              "    pm.expect(contentType.toLowerCase(), 'Content-Type must include application/json')\r",
+              "        .to.include('application/json');\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test('Response is valid JSON', () => {\r",
+              "    pm.expect(pm.response.text(), 'Response body must not be empty')\r",
+              "        .to.not.be.empty;\r",
+              "    \r",
+              "    response = pm.response.json();\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Schema Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Schema is valid', () => {\r",
+              "\r",
+              "    const schema = {\r",
+              "        type: 'object',\r",
+              "        properties: {\r",
+              "            error: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Za-z0-9-_. ]+$'\r",
+              "            }\r",
+              "        },\r",
+              "        required: ['error'],\r",
+              "        additionalProperties: false\r",
+              "    };\r",
+              "\r",
+              "    pm.response.to.have.jsonSchema(schema);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Business Logic Tests\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test(\"Order not present\", () => {\r",
+              "    pm.expect(response.error, 'The Order ID in the \"orderId\" collection vairable can no longer be found')\r",
+              "        .to.eql('No order with id ' + pm.collectionVariables.get(\"orderId\") + '.');\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders/:orderId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "orders",
+            ":orderId"
+          ],
+          "variable": [
+            {
+              "key": "orderId",
+              "value": "{{orderId}}"
+            }
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-ordersorderid--get-single-order](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-ordersorderid--get-single-order)"
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 404', () => {\r",
+              "    pm.response.to.have.status(404);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "pm.test('Content-Type is JSON', () => {\r",
+              "    const contentType = pm.response.headers.get('Content-Type');\r",
+              "    \r",
+              "    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r",
+              "    pm.expect(contentType.toLowerCase(), 'Content-Type must include application/json')\r",
+              "        .to.include('application/json');\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test('Response is valid JSON', () => {\r",
+              "    pm.expect(pm.response.text(), 'Response body must not be empty')\r",
+              "        .to.not.be.empty;\r",
+              "    \r",
+              "    response = pm.response.json();\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Schema Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Schema is valid', () => {\r",
+              "\r",
+              "    const schema = {\r",
+              "        type: 'object',\r",
+              "        properties: {\r",
+              "            error: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Za-z0-9-_. ]+$'\r",
+              "            }\r",
+              "        },\r",
+              "        required: ['error'],\r",
+              "        additionalProperties: false\r",
+              "    };\r",
+              "\r",
+              "    pm.response.to.have.jsonSchema(schema);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Business Logic Tests\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Order not present', () => {\r",
+              "    pm.expect(response.error, 'The Order ID in the \"orderId\" collection variable can no longer be found')\r",
+              "        .to.eql('No order with id ' + pm.collectionVariables.get(\"orderId\") + '.');\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders/:orderId",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "orders",
+            ":orderId"
+          ],
+          "variable": [
+            {
+              "key": "orderId",
+              "value": "{{orderId}}"
+            }
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-ordersorderid--get-single-order](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#get-ordersorderid--get-single-order)"
+      },
+      "response": []
+    },
+    {
+      "name": "Register API client",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Config\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "const MAX_RESPONSE_TIME_MS = 500;\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// HTTP Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Status code is 409', () => {\r",
+              "    pm.response.to.have.status(409);\r",
+              "});\r",
+              "\r",
+              "pm.test('Response time satisfactory', () => {\r",
+              "    pm.expect(pm.response.responseTime, 'Response too slow')\r",
+              "        .to.be.below(MAX_RESPONSE_TIME_MS);\r",
+              "});\r",
+              "\r",
+              "pm.test('Content-Type is JSON', () => {\r",
+              "    const contentType = pm.response.headers.get('Content-Type');\r",
+              "    \r",
+              "    pm.expect(contentType, 'Missing Content-Type header').to.exist;\r",
+              "    pm.expect(contentType.toLowerCase(), 'Content-Type must include application/json')\r",
+              "        .to.include('application/json');\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Parse Response\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "let response;\r",
+              "\r",
+              "pm.test('Response is valid JSON', () => {\r",
+              "    pm.expect(pm.response.text(), 'Response body must not be empty')\r",
+              "        .to.not.be.empty;\r",
+              "    \r",
+              "    response = pm.response.json();\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Schema Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Schema is valid', () => {\r",
+              "\r",
+              "    const schema = {\r",
+              "        type: 'object',\r",
+              "        properties: {\r",
+              "            error: {\r",
+              "                type: 'string',\r",
+              "                pattern: '^[A-Za-z0-9-_. ]+$'\r",
+              "            }\r",
+              "        },\r",
+              "        required: ['error'],\r",
+              "        additionalProperties: false\r",
+              "    };\r",
+              "\r",
+              "    pm.response.to.have.jsonSchema(schema);\r",
+              "});\r",
+              "\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "// Response Body Validation\r",
+              "// ─────────────────────────────────────────────────────────────────────────────\r",
+              "\r",
+              "pm.test('Request body is not empty', () => {\r",
+              "    pm.expect(response, 'Response must not be null')\r",
+              "        .to.not.be.null\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n   \"clientName\": \"Postman\",\r\n   \"clientEmail\": \"{{email}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api-clients",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api-clients"
+          ]
+        },
+        "description": "Documentation can be found in the simple-books-api-collection repo's README.md file: [https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#api-clients](https://github.com/gisbey/simple-books-api-collection/blob/main/README.md#api-clients)"
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://simple-books-api.click"
+    },
+    {
+      "key": "accessToken",
+      "value": "dce40f252f63c59c2ec12eda6e9cf48a309228d629e8984f26e91a418c69523f"
+    },
+    {
+      "key": "bookId",
+      "value": ""
+    },
+    {
+      "key": "bookName",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "customerName",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": ""
+    }
+  ]
+}
