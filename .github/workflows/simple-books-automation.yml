@@ -1,9 +1,9 @@
 
-name: Automated API tests using Postman CLI
-
 ######################################################################
       # COLLECTION RUNS ON PUSH AND DAILY AT 07:00
 ######################################################################
+
+name: Automated API tests using Postman CLI
 
 on:
   push:
