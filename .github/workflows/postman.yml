@@ -24,7 +24,7 @@ jobs:
         id: postman
         run: |
           postman collection run "17318486-52f1c847-da9f-4423-9c78-640fa2cdeed8" \
-            --iteration-count 5 \
+            --iteration-count 10 \
             --reporters cli,json \
             --reporter-json-export test-results.json
 
