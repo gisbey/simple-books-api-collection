@@ -1,6 +1,6 @@
 # Simple Books API – Postman Collection
 
-A complete Postman collection for testing and exploring the **Simple Books API** – a RESTful API for browsing books and managing orders. This collection doubles as both a reference guide and an end-to-end workflow test suite.
+A complete Postman collection for testing and exploring the **Simple Books API** – a RESTful API for browsing books and managing orders. This collection demonstrates a user journey through the workflow and is intended to showcase Postman proficiency, rather than serve as a comprehensive test suite.
 
 ---
 
